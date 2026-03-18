@@ -1,0 +1,11 @@
+OrderID,OrderDate,CustomerName,CustomerEmail,Amount,Region,Status
+1021,2025-06-21,Ravi Kumar,ravikumar@example.com,777,West,Completed
+1022,2025-06-23,Sneha Joshi,snehajoshi@example.com,2223,West,Completed
+1023,2025-06-27,Karan Mehta,karanmehta@example.com,732,East,Completed
+1024,2025-07-02,Divya Iyer,divyaiyer@example.com,472,West,Failed
+1025,2025-07-04,Nikhil Roy,nikhilroy@example.com,742,West,Completed
+1026,2025-07-05,Ananya Singh,ananyasingh@example.com,1030,South,Pending
+1027,2025-07-08,Rahul Verma,rahulverma@example.com,2429,East,Completed
+1028,2025-07-13,Meera Nair,meeranair@example.com,2181,North,Completed
+1029,2025-07-17,Suresh Das,sureshdas@example.com,1197,East,Completed
+1030,2025-07-20,Isha Bhat,ishabhat@example.com,2024,South,Failed
