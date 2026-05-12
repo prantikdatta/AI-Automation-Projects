@@ -1,0 +1,431 @@
+{
+  "name": "Youtube Thumbnail Creator",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# ROLE\nYou are an expert YouTube thumbnail designer specializing in high-CTR (Click-Through Rate) visual content that captures attention and drives views.\n\n# TASK\nCreate a detailed thumbnail generation prompt for NanoBanana based on the provided video information and image descriptions. Your prompt should result in a professional, eye-catching YouTube thumbnail optimized for mobile viewing and maximum engagement.\n\n# INPUT DATA\n- **Image 1 Description:** {{ $json.image1Description }}\n- **Image 2 Description:** {{ $json.image2Description }}\n- **Video Title:** {{ $('On form submission').first().json['Video Title'] }}\n- **Video Context:** {{ $('On form submission').first().json['Video Idea/Context'] }}\n\n# INSTRUCTIONS\nAnalyze the video title, context, and image descriptions, then create a complete NanoBanana prompt that includes:\n\n1. **Background Selection:** Choose which image should be the main background and why\n2. **Image Composition:** Specify how to overlay and position the images\n3. **Text Hierarchy:** Create 2-3 levels of text:\n   - Primary headline (extracted/adapted from video title - large, bold, max 4-6 words)\n   - Secondary badge text (engaging hook with emoji - sticker style)\n   - Tertiary hook text (2 short punchy lines - keywords/phrases)\n4. **Visual Highlights:** Identify 2-3 key elements to emphasize with arrows/glow based on image content\n5. **Color Palette:** Suggest text colors and background tones that match the video theme\n6. **Font Style:** Specify bold, YouTube-optimized typography\n7. **Technical Specs:** 16:9 aspect ratio, mobile-optimized, high contrast\n\n# DESIGN PRINCIPLES\n- Faces should be cropped close and clearly visible\n- Text must be readable on mobile screens (bold, thick outlines)\n- Use emotional triggers and power words\n- Create visual hierarchy and focus points\n- Maintain clean, premium, energetic aesthetic\n- Optimize for YouTube CTR\n\n# EXAMPLE OUTPUT FORMAT\nYour response should follow this structure:\n\n\"Create a powerful YouTube thumbnail using the provided images.\n\nUse [IMAGE CHOICE] as the main background to showcase [CORE MESSAGE/THEME].\n\nOverlay supporting image:\n– [HOW TO USE SECOND IMAGE]\n\nCrop faces clearly and bring them closer to the frame for strong emotional connection.\nEnhance lighting, sharpness, and contrast to ensure faces pop on mobile screens.\n\nAdd bold, eye-catching text:\n\"[PRIMARY HEADLINE]\" (large, bold)\n\"[SECONDARY BADGE TEXT WITH EMOJI]\" (badge / sticker style)\n\nAdd a smaller hook text:\n\"[HOOK LINE 1]\"\n\"[HOOK LINE 2]\"\n\nHighlight key elements using subtle arrows or glow:\n– [HIGHLIGHT ELEMENT 1]\n– [HIGHLIGHT ELEMENT 2]\n\nColor palette: [TEXT COLORS] text with dark outlines, [BACKGROUND TONES] background tones.\nFont: bold sans-serif, thick stroke, YouTube-optimized readability.\n\nKeep the layout clean, premium, energetic — no clutter.\nAspect ratio 16:9, optimized for YouTube CTR.\"\n\n# NOTES\n- Extract the most compelling angle from the video title and context\n- Create urgency and curiosity with your text choices\n- Ensure all text is concise and punchy (avoid full sentences in headlines)\n- Match the energy level to the video content (educational vs entertainment vs motivational)\n- Consider the target audience when choosing words and visual style\n- If images contain people, prioritize showing faces prominently\n- If images show products/results/achievements, highlight those with visual emphasis\n\nNow generate the complete NanoBanana thumbnail prompt based on the input data provided above.",
+        "options": {
+          "passthroughBinaryImages": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "ba26282c-d52f-4843-b679-f66f17c9f155",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "chatgpt-4o-latest",
+          "mode": "list",
+          "cachedResultName": "chatgpt-4o-latest"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -32,
+        192
+      ],
+      "id": "5ff6b37d-c8a5-4252-af85-f08d82ca9e72",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "ozqrxU8Na91LHSWd",
+          "name": "Main API Connect"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "formTitle": "Youtube Thumnail Creator",
+        "formDescription": "Create thumbnail for your youtube videos",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Video Title",
+              "placeholder": "Vlog 02: You Don't Wanna Miss This"
+            },
+            {
+              "fieldLabel": "Video Idea/Context",
+              "fieldType": "textarea",
+              "placeholder": "Vlog 02: AI, Investors, and Creator Panel Discussions, Event Outings, Sales Techniques, and More. In this episode of my vlog series, I’m taking you behind the curtain of how business conversations actually happen when you’re surrounded by creators who have a combined following of over 1 million.\n\nFrom strategy jams and growth talks to unexpectedly fun outings, this vlog captures the real chemistry, the creative chaos, and the momentum that comes from hanging out with people who live and breathe content.\n\nIf you're building in the creator economy, scaling your personal brand, or just curious about what happens when ambitious minds collide outside the boardroom—this one’s for you.\n",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Image 1",
+              "fieldType": "file",
+              "multipleFiles": false,
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Image 2",
+              "fieldType": "file",
+              "multipleFiles": false,
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        -1008,
+        384
+      ],
+      "id": "aa88f39a-e897-4ead-8965-4fbad49bc5b8",
+      "name": "On form submission",
+      "webhookId": "07fbc880-4eb1-4837-a517-e23d2a2ec26c"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "text": "Analyze the image then give description on what is the image about, what is the meaning, and other details to create a prompt for youtube thumbnail.",
+        "inputType": "binary",
+        "binaryPropertyName": "Image_1",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -640,
+        96
+      ],
+      "id": "ae40fe31-09e6-4c75-8b6e-937acf1144f8",
+      "name": "Analyze image 1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "CceiwKqUHhmLi1YE",
+          "name": "Google Gemini(LLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "text": "Analyze the image then give description on what is the image about, what is the meaning, and other details to create a prompt for youtube thumbnail.",
+        "inputType": "binary",
+        "binaryPropertyName": "Image_2",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -656,
+        288
+      ],
+      "id": "8cdd8db0-6ee7-458a-95bf-f32ce37c59b9",
+      "name": "Analyze image 2",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "CceiwKqUHhmLi1YE",
+          "name": "Google Gemini(LLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nconst image1Text = items[0]?.json?.content?.parts?.[0]?.text || '';\nconst image2Text = items[1]?.json?.content?.parts?.[0]?.text || '';\n\nconst binaries = {};\n\n// Collect all binary files dynamically\nitems.forEach(item => {\n  if (item.binary) {\n    Object.entries(item.binary).forEach(([key, value]) => {\n      binaries[key] = value;\n    });\n  }\n});\n\nreturn [\n  {\n    json: {\n      image1Description: image1Text,\n      image2Description: image2Text\n    },\n    binary: binaries\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -176,
+        16
+      ],
+      "id": "c43c7c76-d68e-49f3-8328-2069e1c5ca9a",
+      "name": "Make it 1 item"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -400,
+        144
+      ],
+      "id": "c4477056-97cb-45b9-ab73-04db1a23adcc",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c0128995-03bd-49e7-aab8-45893fd170a1",
+              "name": "Image 1",
+              "value": "Image_1",
+              "type": "binary"
+            },
+            {
+              "id": "ddb71a30-6bc6-4f2b-918d-6b97882ee7cf",
+              "name": "Image 2",
+              "value": "Image_2",
+              "type": "binary"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        144,
+        368
+      ],
+      "id": "0c4bcb51-d818-4f91-8cf5-b62e8543260e",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        320,
+        208
+      ],
+      "id": "a2902fcc-a6f9-4fa8-9520-37001856a8fe",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nconst outJson = {};\nconst outBinary = {};\n\nlet textIndex = 1;\nlet imageIndex = 1;\n\nitems.forEach((item) => {\n\n  // -------- TEXT ----------\n  const text = item.json?.content?.parts?.[0]?.text;\n  if (text) {\n    outJson[`image${textIndex}Description`] = text;\n    textIndex++;\n  }\n\n  // -------- BINARY ----------\n  if (item.binary) {\n    Object.entries(item.binary).forEach(([key, value]) => {\n      outBinary[`image_${imageIndex}`] = value;\n      imageIndex++;\n    });\n  }\n\n});\n\nreturn [\n  {\n    json: outJson,\n    binary: outBinary\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        528,
+        208
+      ],
+      "id": "6620d351-0c98-4641-a626-d6918f85f4e5",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "amount": 30
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        736,
+        208
+      ],
+      "id": "612aa991-5431-47eb-8f57-bcd6418e1eb8",
+      "name": "Wait",
+      "webhookId": "e4ecdc6c-dca8-4894-8fa1-0381c40881de"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "edit",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-3-pro-image-preview",
+          "mode": "list",
+          "cachedResultName": "models/gemini-3-pro-image-preview (Nano Banana Pro)"
+        },
+        "prompt": "={{ $('AI Agent').first().json.output }}\n\nStrictly use only the Images provided, DO NOT generate new people. Maintain Character Consistency. \n\n Color palette: white & yellow text with dark outlines, subtle blue/black background tones.\nFont: bold sans-serif, thick stroke, YouTube-optimized readability.\n\nDo NOT write too much text. Only include Maximum 5 Words  in the Thumbnail. DO NOT CLUTTER with Texts. Keep It Clean and Classy. Just keep the Title Texts, remove any extra small pop ups on top of the thumbnail.",
+        "images": {
+          "values": [
+            {
+              "binaryPropertyName": "image_1"
+            },
+            {
+              "binaryPropertyName": "image_2"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        944,
+        192
+      ],
+      "id": "e39e90b4-b901-4a16-acf3-47d8f2e8cb7e",
+      "name": "Edit an image",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "7ukgQVuOL2AhmXdK",
+          "name": "P.S2208 Google Gemini Api account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Analyze image 1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Analyze image 2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze image 1": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze image 2": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Make it 1 item": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Make it 1 item",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Edit an image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit an image": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "344e0311-b57a-4689-8559-613c14817f9f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "553b57d613227d205d7ede55094834dd7153866ccda4c971fd59f5fa147ec838"
+  },
+  "id": "sFnn0DSV8Tp3FNZN",
+  "tags": []
+}
