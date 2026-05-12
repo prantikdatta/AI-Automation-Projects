@@ -455,6 +455,7 @@ Which products are low in stock?
 # Architecture Diagram
 
 <img width="763" height="299" alt="image" src="https://github.com/user-attachments/assets/168da5ad-f42c-45c7-9b49-7304e9b2b88c" />
+<br><br>
 
 ![Image](https://images.openai.com/static-rsc-4/WimQjBcY1yFaIsp43uoCQ84XhbablGA9XHMRpXjVMzQLFVG98uUjzUF3TwE5QUu1hJcV29q3RJunFNdeBncazN5kjf_3vBIl1z3kXYJE6uYiB1SNQHCLi1GdOk6DVMVLvhuEeTzuC8UqSgWixVSqnND1IQli8THtwFXng-mplgj7ZYWPg_iRud0kK8CA3sjJ?purpose=fullsize)
 
