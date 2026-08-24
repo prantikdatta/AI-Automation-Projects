@@ -1,0 +1,151 @@
+{
+  "name": "Job Search - Controlled Application Execution",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "job-application",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "job-application"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $json.body ?? $json;\n\nconst application = body.application ?? {};\nconst job = body.job ?? {};\n\nconst errors = [];\n\nif (body.event !== 'job_application') {\n  errors.push('Invalid event.');\n}\n\nif (body.version !== '1.0') {\n  errors.push('Unsupported contract version.');\n}\n\nif (!job.job_id) {\n  errors.push('Missing job.job_id.');\n}\n\nif (!job.job_url) {\n  errors.push('Missing job.job_url.');\n}\n\nif (!application.eligible) {\n  errors.push('Application item is not eligible.');\n}\n\nconst allowedQueueStatuses = ['READY', 'READY_WITH_TAILORING'];\n\nif (!allowedQueueStatuses.includes(application.queue_status)) {\n  errors.push(\n    `Unsupported queue_status: ${application.queue_status ?? '<missing>'}.`\n  );\n}\n\nconst isValidationPayload =\n  job.job_id === 'n8n-local-validation-001' ||\n  job.provider === 'validation';\n\nif (isValidationPayload) {\n  return [{\n    json: {\n      accepted: true,\n      execution_mode: 'VALIDATION',\n      status: 'SUBMITTED',\n      message: 'Local n8n validation workflow completed.',\n      metadata: {\n        workflow: 'controlled-application-execution',\n        test: true,\n        validation_only: true,\n        job_id: job.job_id,\n        company: job.company ?? '',\n      },\n    },\n  }];\n}\n\nif (errors.length > 0) {\n  return [{\n    json: {\n      accepted: false,\n      execution_mode: 'REJECTED',\n      status: 'FAILED',\n      message: 'Application request failed n8n contract validation.',\n      metadata: {\n        workflow: 'controlled-application-execution',\n        validation_only: false,\n        errors,\n        job_id: job.job_id ?? '',\n      },\n    },\n  }];\n}\n\nreturn [{\n  json: {\n    accepted: true,\n    execution_mode: 'CONTROLLED',\n    status: 'READY',\n    message: 'Application request passed n8n execution gates. No external application was submitted.',\n    metadata: {\n      workflow: 'controlled-application-execution',\n      validation_only: false,\n      external_submission: false,\n      next_stage: 'application-automation-adapter',\n      job_id: job.job_id,\n      company: job.company ?? '',\n      title: job.title ?? '',\n      job_url: job.job_url,\n      queue_status: application.queue_status,\n      readiness_decision: application.readiness_decision,\n    },\n  },\n}];"
+      },
+      "id": "2",
+      "name": "Validate Application Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        280,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "accepted",
+              "leftValue": "={{ $json.accepted }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "3",
+      "name": "Accepted?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        560,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "4",
+      "name": "Respond - Accepted",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        840,
+        -100
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "5",
+      "name": "Respond - Rejected",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        840,
+        100
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate Application Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Application Request": {
+      "main": [
+        [
+          {
+            "node": "Accepted?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Accepted?": {
+      "main": [
+        [
+          {
+            "node": "Respond - Accepted",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond - Rejected",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "controlled-application-execution-v1",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "tags": []
+}

@@ -1,0 +1,92 @@
+{
+  "name": "Job Search - Monthly Refresh",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 1,8,15,22 * *"
+            }
+          ]
+        }
+      },
+      "id": "monthly-schedule-trigger",
+      "name": "Monthly Job Refresh",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -360,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:8000/jobs/search",
+        "sendHeaders": false,
+        "sendBody": false,
+        "options": {
+          "timeout": 900000
+        }
+      },
+      "id": "run-job-search-pipeline",
+      "name": "Run Job Search Pipeline",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -80,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const response = $json;\n\nconst jobs = Array.isArray(response.jobs)\n  ? response.jobs\n  : [];\n\nreturn [\n  {\n    json: {\n      automation: 'monthly-job-refresh',\n      status: response.success === true ? 'SUCCESS' : 'FAILED',\n      executed_at: new Date().toISOString(),\n      total_found: response.total_found ?? jobs.length,\n      total_returned: response.total_returned ?? jobs.length,\n      jobs_generated: jobs.length,\n      message: response.message ?? '',\n    },\n  },\n];"
+      },
+      "id": "summarize-refresh",
+      "name": "Refresh Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        200,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Monthly Job Refresh": {
+      "main": [
+        [
+          {
+            "node": "Run Job Search Pipeline",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Job Search Pipeline": {
+      "main": [
+        [
+          {
+            "node": "Refresh Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Kolkata"
+  },
+  "versionId": "monthly-job-refresh-v1",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "tags": []
+}

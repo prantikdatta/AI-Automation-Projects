@@ -1,0 +1,109 @@
+{
+  "name": "Job Search Automation - Application Stage 2",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "job-application",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "job-application-webhook",
+      "name": "Job Application Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "job-application"
+    },
+    {
+      "parameters": {
+        "jsCode": "const payload = $json.body ?? $json;\n\nif (!payload || typeof payload !== 'object') {\n  return [\n    {\n      json: {\n        status: 'FAILED',\n        message: 'Invalid request payload.',\n        metadata: {\n          executor: 'n8n',\n          validation: true,\n          stage: 'payload_validation'\n        }\n      }\n    }\n  ];\n}\n\nconst required = [\n  'job_id',\n  'title',\n  'company',\n  'location',\n  'job_url',\n  'queue_status'\n];\n\nconst missing = required.filter((field) => {\n  const value = payload[field];\n  return value === undefined || value === null || String(value).trim() === '';\n});\n\nif (missing.length > 0) {\n  return [\n    {\n      json: {\n        status: 'FAILED',\n        message: `Missing required fields: ${missing.join(', ')}`,\n        metadata: {\n          executor: 'n8n',\n          validation: true,\n          stage: 'payload_validation',\n          missing_fields: missing\n        }\n      }\n    }\n  ];\n}\n\nconst executableStatuses = [\n  'READY',\n  'READY_WITH_TAILORING'\n];\n\nconst queueStatus = String(payload.queue_status).trim().toUpperCase();\n\nif (!executableStatuses.includes(queueStatus)) {\n  return [\n    {\n      json: {\n        status: 'REJECTED',\n        message: `Queue item is not executable: ${queueStatus}`,\n        metadata: {\n          executor: 'n8n',\n          validation: true,\n          stage: 'queue_validation',\n          queue_status: queueStatus,\n          external_submission: false\n        }\n      }\n    }\n  ];\n}\n\nreturn [\n  {\n    json: {\n      ...payload,\n      _n8n_validation: {\n        payload_valid: true,\n        queue_status_valid: true,\n        external_submission: false\n      }\n    }\n  }\n];"
+      },
+      "id": "validate-application-payload",
+      "name": "Validate Application Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const payload = $json;\n\nif (payload.status === 'FAILED' || payload.status === 'REJECTED') {\n  return [\n    {\n      json: payload\n    }\n  ];\n}\n\nconst queueStatus = String(payload.queue_status).trim().toUpperCase();\nconst tailoringRequired = queueStatus === 'READY_WITH_TAILORING';\n\nreturn [\n  {\n    json: {\n      status: 'READY',\n      message: tailoringRequired\n        ? 'Application accepted by n8n boundary; resume tailoring is required before submission.'\n        : 'Application accepted by n8n boundary; external submission is disabled in Stage 2.',\n      metadata: {\n        executor: 'n8n-local-stage-2',\n        validation: true,\n        external_submission: false,\n        application_ready: true,\n        resume_tailoring_required: tailoringRequired,\n        queue_status: queueStatus,\n        job_id: payload.job_id,\n        company: payload.company,\n        title: payload.title\n      }\n    }\n  }\n];"
+      },
+      "id": "application-stage-2",
+      "name": "Application Stage 2",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        500,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "application-response",
+      "name": "Application Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        760,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Job Application Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate Application Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Application Payload": {
+      "main": [
+        [
+          {
+            "node": "Application Stage 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Application Stage 2": {
+      "main": [
+        [
+          {
+            "node": "Application Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "job-search-automation-stage-2",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "tags": []
+}

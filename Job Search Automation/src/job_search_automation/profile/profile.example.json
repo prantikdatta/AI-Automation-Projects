@@ -1,0 +1,36 @@
+{
+    "name": "Candidate",
+    "experience_years": 5.0,
+    "skills": [
+        "SQL",
+        "Power BI",
+        "Excel",
+        "Python",
+        "Stakeholder Management",
+        "Executive Reporting",
+        "Process Optimization",
+        "Generative AI",
+        "Workflow Automation"
+    ],
+    "preferred_locations": [
+        "Mumbai",
+        "Bangalore",
+        "Hyderabad",
+        "Remote"
+    ],
+    "preferred_roles": [
+        "Data Analyst",
+        "Business Analyst",
+        "Business Intelligence Analyst",
+        "Analytics Consultant",
+        "Product Analyst"
+    ],
+    "domains": [
+        "Logistics",
+        "Finance",
+        "FinTech",
+        "Insurance",
+        "Technology"
+    ],
+    "certifications": []
+}

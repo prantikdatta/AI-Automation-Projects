@@ -1,0 +1,58 @@
+from __future__ import annotations
+
+
+ROLE_TAXONOMY: dict[str, list[str]] = {
+    "CORE_ANALYTICS": [
+        "Data Analyst",
+        "Senior Data Analyst",
+        "Analytics Engineer",
+        "Reporting Analyst",
+        "Business Intelligence Analyst",
+        "BI Analyst",
+        "BI Developer",
+        "Business Intelligence Developer",
+        "Insights Analyst",
+        "Decision Scientist",
+        "Analytics Consultant",
+        "Data Consultant",
+    ],
+    "BUSINESS_ANALYTICS": [
+        "Business Analyst",
+        "Senior Business Analyst",
+        "Business Systems Analyst",
+        "Strategy Analyst",
+        "Operations Analyst",
+        "Commercial Analyst",
+        "Process Analyst",
+    ],
+    "PRODUCT_ANALYTICS": [
+        "Product Analyst",
+        "Senior Product Analyst",
+        "Growth Analyst",
+        "Experimentation Analyst",
+        "Customer Insights Analyst",
+        "Customer Analyst",
+        "Digital Analyst",
+        "Marketing Analyst",
+    ],
+    "FINTECH_ANALYTICS": [
+        "Risk Analyst",
+        "Credit Risk Analyst",
+        "Fraud Analyst",
+        "Credit Analyst",
+        "Financial Analyst",
+        "Risk Analytics",
+        "Credit Analytics",
+    ],
+    "PROGRAM_MANAGEMENT": [
+        "Program Manager",
+        "Technical Program Manager",
+        "Project Manager",
+        "Delivery Manager",
+        "PMO",
+        "PMO Analyst",
+        "Transformation Manager",
+        "Implementation Manager",
+        "Operations Manager",
+    ],
+}
